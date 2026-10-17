@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulavapalla 2026 Voter Statistics</title>
+<style>
+:root{--navy:#17365d;--blue:#2457a7;--teal:#18a999;--gold:#f2b134;--coral:#d95d39;--ink:#1d2939;--muted:#667085;--bg:#f3f6fb;--line:#e4e7ec;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Segoe UI",Arial,sans-serif}
+header{background:linear-gradient(115deg,#17365d,#2457a7);color:white;padding:24px 30px 18px}
+.headerrow{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+h1{margin:0;font-size:25px;letter-spacing:.2px}header p{margin:5px 0 0;color:#dce7f7}
+.tag{border:1px solid #ffffff55;border-radius:999px;padding:6px 11px;font-size:12px}
+nav{display:flex;gap:8px;flex-wrap:wrap;padding:14px 24px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
+nav button{border:0;border-radius:8px;padding:10px 15px;background:#eef2f8;color:#344054;font-weight:600;cursor:pointer}
+nav button.active{background:var(--blue);color:#fff}
+main{max-width:1450px;margin:auto;padding:20px 24px 36px}
+.filters{display:flex;gap:12px;align-items:end;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}
+.filters label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:12px;font-weight:600}
+select{min-width:145px;padding:9px 10px;border:1px solid #d0d5dd;border-radius:7px;background:white;color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px;margin-bottom:16px}
+.card,.panel{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 2px 8px #172b4d08}
+.kpi{padding:17px 18px}.kpi .label{color:var(--muted);font-size:12px;font-weight:600}.kpi .value{font-size:28px;font-weight:750;margin-top:5px;color:var(--navy)}.kpi .note{font-size:11px;color:var(--muted);margin-top:3px}
+.grid2{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-bottom:16px}
+.panel{padding:17px;min-width:0}.panel h2{font-size:15px;margin:0 0 4px}.sub{color:var(--muted);font-size:12px;margin-bottom:12px}
+.chart{width:100%;min-height:245px;display:block}.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}
+.tablewrap{overflow:auto;max-height:350px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap}th{background:#f8fafc;color:#475467;position:sticky;top:0}
+.notice{padding:16px 18px;background:#fff8e6;border:1px solid #f5d98b;border-radius:10px;color:#704d00}
+.muted{color:var(--muted)}.hide{display:none!important}.footer{font-size:11px;color:var(--muted);padding:18px 2px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(130px,1fr))}.grid2{grid-template-columns:1fr}main{padding:14px}.chart{min-height:220px}}
+@media(max-width:500px){h1{font-size:21px}.kpis{grid-template-columns:1fr 1fr}.kpi .value{font-size:22px}}
+</style></head><body>
+<header><div class="headerrow"><div><h1>Ulavapalla 2026 Voter Statistics</h1><p>English dashboard · Register summary and demographic statistics</p></div><span class="tag">10 Wards · Descriptive data</span></div></header>
+<nav>
+<button class="active" data-page="overview">Overview</button><button data-page="win">Win Percentage</button><button data-page="ward">Wardwise</button><button data-page="family">Familywise</button>
+</nav>
+<main>
+<div class="filters">
+<label>Ward<select id="wardFilter"><option value="all">All wards</option></select></label>
+
+<label>Age group<select id="ageFilter"><option value="all">All ages</option></select></label>
+<button id="reset" style="padding:9px 13px;border:0;background:#eaf0fa;color:#2457a7;border-radius:7px;font-weight:600;cursor:pointer">Reset filters</button>
+</div>
+<section id="overview" class="page">
+<div class="kpis" id="overviewKpis"></div><div class="panel" style="margin-bottom:16px"><h2>Support Status</h2><div class="sub">Support status summary</div><div class="kpis" id="supportDemoKpis" style="margin:0"></div></div>
+<div class="grid2"><div class="panel"><h2>Voters by Ward</h2><div class="sub">Total registered voters in each ward</div><svg id="wardBars" class="chart" viewBox="0 0 700 300"></svg></div>
+<div class="panel"><h2>Gender Distribution</h2><div class="sub">Counts from the provided register</div><svg id="genderDonut" class="chart" viewBox="0 0 420 300"></svg><div id="genderLegend" class="legend"></div></div></div>
+<div class="grid2"><div class="panel"><h2>Age Group Distribution</h2><div class="sub">Age bands calculated from listed ages</div><svg id="ageBars" class="chart" viewBox="0 0 700 300"></svg></div>
+<div class="panel"><h2>Ward Summary</h2><div class="sub">Gender breakdown by ward</div><div class="tablewrap"><table id="overviewTable"></table></div></div></div>
+</section>
+<section id="win" class="page hide">
+<div class="notice"><b>Official election results required.</b><br>A win percentage or outcome prediction cannot be derived from voter-register counts or sample support labels. Use verified official results for descriptive measures such as vote share and winning margin. Until those results are imported, this page intentionally shows no estimated winner or probability.</div>
+<div class="kpis" style="margin-top:16px"><div class="card kpi"><div class="label">Official winner</div><div class="value">Not loaded</div><div class="note">Requires official result</div></div><div class="card kpi"><div class="label">Votes received</div><div class="value">—</div><div class="note">Requires official result</div></div><div class="card kpi"><div class="label">Vote share</div><div class="value">—</div><div class="note">Votes received ÷ valid votes</div></div><div class="card kpi"><div class="label">Winning margin</div><div class="value">—</div><div class="note">Winner votes minus runner-up votes</div></div></div>
+<div class="panel" style="margin-top:16px"><h2>Recommended official-results table</h2><div class="sub">Import verified results with these fields to populate this page. Vote share = candidate votes ÷ total valid votes × 100; this is not the same as a probability of winning.</div><table><thead><tr><th>Election</th><th>Ward / Constituency</th><th>Candidate</th><th>Votes Received</th><th>Total Valid Votes</th><th>Result</th><th>Source</th></tr></thead><tbody><tr><td colspan="7" class="muted">No official results supplied in the voter register.</td></tr></tbody></table></div>
+</section>
+<section id="ward" class="page hide">
+<div class="kpis" id="wardKpis"></div>
+<div class="grid2"><div class="panel"><h2>Ward Voter Comparison</h2><div class="sub">Male, female and other/unknown counts</div><svg id="wardGenderBars" class="chart" viewBox="0 0 700 330"></svg></div><div class="panel"><h2>Ward Share of Register</h2><div class="sub">Each ward's proportion of filtered voters</div><svg id="wardDonut" class="chart" viewBox="0 0 420 300"></svg><div id="wardLegend" class="legend"></div></div></div>
+<div class="panel"><h2>Wardwise Details</h2><div class="sub">Select a ward or gender using the filters above</div><div class="tablewrap"><table id="wardTable"></table></div></div>
+</section>
+<section id="family" class="page hide">
+<div class="kpis" id="familyKpis"></div>
+<div class="grid2"><div class="panel"><h2>Household Size Bands</h2><div class="sub">Counts of house-number groups by number of listed voters; house number is a proxy and may need validation</div><svg id="houseBars" class="chart" viewBox="0 0 700 300"></svg></div><div class="panel"><h2>Family Relation Categories</h2><div class="sub">Relationship labels recorded in the register</div><svg id="relationBars" class="chart" viewBox="0 0 700 300"></svg></div></div>
+<div class="panel"><h2>Familywise Aggregate Summary</h2><div class="sub">Aggregated by ward and household-size band; no individual supporter classifications</div><div class="tablewrap"><table id="familyTable"></table></div></div>
+</section>
+<div class="footer">Source: supplied Ulavapalla 2026 voter register. Use this dashboard for aggregate descriptive statistics. Keep identifiable voter data private. This HTML dashboard is an alternative preview, not a native Power BI .pbix file.</div>
+</main>
+<script>
+const DATA = {"title": "Ulavapalla 2026 Voter Statistics", "total": 1512, "male": 737, "female": 775, "other": 0, "wards": [{"ward": 1, "total": 151, "male": 71, "female": 80, "other": 0}, {"ward": 2, "total": 151, "male": 77, "female": 74, "other": 0}, {"ward": 3, "total": 151, "male": 78, "female": 73, "other": 0}, {"ward": 4, "total": 151, "male": 77, "female": 74, "other": 0}, {"ward": 5, "total": 151, "male": 76, "female": 75, "other": 0}, {"ward": 6, "total": 151, "male": 60, "female": 91, "other": 0}, {"ward": 7, "total": 151, "male": 76, "female": 75, "other": 0}, {"ward": 8, "total": 151, "male": 70, "female": 81, "other": 0}, {"ward": 9, "total": 151, "male": 73, "female": 78, "other": 0}, {"ward": 10, "total": 153, "male": 79, "female": 74, "other": 0}], "age": [{"group": "46–60", "count": 429}, {"group": "71–80", "count": 71}, {"group": "26–35", "count": 326}, {"group": "61–70", "count": 138}, {"group": "18–25", "count": 168}, {"group": "36–45", "count": 367}, {"group": "81+", "count": 13}], "gender": [{"label": "Female", "count": 775}, {"label": "Male", "count": 737}], "relations": [{"label": "Father", "count": 872}, {"label": "Husband", "count": 612}, {"label": "Mother", "count": 22}, {"label": "Unknown", "count": 6}], "householdDistribution": [{"band": "1 voter", "count": 326}, {"band": "2–3 voters", "count": 239}, {"band": "4–5 voters", "count": 99}, {"band": "6+ voters", "count": 27}], "households": 691, "avgAge": 43.8};
+const colors=["#2457a7","#18a999","#f2b134","#d95d39","#7a6ff0","#5c677d","#a7c957","#8bb8e8","#d77fa1"];
+const fmt=n=>Number(n||0).toLocaleString("en-IN");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const wardFilter=document.getElementById("wardFilter"), ageFilter=document.getElementById("ageFilter");
+DATA.wards.forEach(x=>wardFilter.add(new Option("Ward "+x.ward,x.ward)));
+DATA.age.forEach(x=>ageFilter.add(new Option(x.group,x.group)));
+function filteredWards(){let w=wardFilter.value;return DATA.wards.filter(x=>w==="all"||String(x.ward)===w)}
+function genderFactor(g){if(genderFilter.value==="all")return true; if(genderFilter.value==="Other")return g.other>0;return true}
+function kpi(label,value,note=""){return `<div class="card kpi"><div class="label">${esc(label)}</div><div class="value">${esc(value)}</div><div class="note">${esc(note)}</div></div>`}
+function setKpis(id,arr){document.getElementById(id).innerHTML=arr.join("")}
+function svgText(x,y,t,size=12,fill="#667085",anchor="start",weight="400"){return `<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" text-anchor="${anchor}" font-weight="${weight}">${esc(t)}</text>`}
+function barChart(id,items,labelKey,valueKey,opts={}){let el=document.getElementById(id),W=opts.W||700,H=opts.H||300,pL=opts.pL||115,pR=30,pT=15,pB=28;let max=Math.max(1,...items.map(d=>d[valueKey]||0));let row=(H-pT-pB)/Math.max(1,items.length);let s=`<line x1="${pL}" y1="${pT}" x2="${pL}" y2="${H-pB}" stroke="#d0d5dd"/>`;items.forEach((d,i)=>{let y=pT+i*row+row*.18,bh=Math.min(24,row*.62),bw=(W-pL-pR)*(d[valueKey]||0)/max;s+=svgText(pL-9,y+bh*.78,d[labelKey],11,"#475467","end");s+=`<rect x="${pL}" y="${y}" width="${Math.max(0,bw)}" height="${bh}" rx="4" fill="${colors[i%colors.length]}"/>`;s+=svgText(Math.min(W-5,pL+bw+6),y+bh*.78,fmt(d[valueKey]),11,"#344054","start","600")});el.innerHTML=s}
+function stackedWard(id,items){let el=document.getElementById(id),W=700,H=330,pL=75,pR=25,pT=15,pB=28,max=Math.max(1,...items.map(x=>x.total)),row=(H-pT-pB)/Math.max(1,items.length),s="";items.forEach((d,i)=>{let y=pT+i*row+row*.18,bh=Math.min(23,row*.62),scale=(W-pL-pR)/max,x=pL;let parts=[["male",d.male,colors[0]],["female",d.female,colors[1]],["other",d.other,colors[2]]];s+=svgText(pL-8,y+bh*.8,"Ward "+d.ward,11,"#475467","end");parts.forEach(([k,v,c])=>{let bw=v*scale;s+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="${c}" rx="2"><title>${k}: ${v}</title></rect>`;x+=bw});s+=svgText(x+6,y+bh*.8,fmt(d.total),10,"#344054")});el.innerHTML=s}
+function donut(id,items,labelKey,valueKey,legendId){let el=document.getElementById(id),total=items.reduce((a,d)=>a+(d[valueKey]||0),0),cx=155,cy=145,r=88,ri=55,angle=-Math.PI/2,s="";items.forEach((d,i)=>{let v=d[valueKey]||0;if(!v)return;let a=v/Math.max(1,total)*Math.PI*2,b=angle+a;let x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle),x2=cx+r*Math.cos(b),y2=cy+r*Math.sin(b),ix2=cx+ri*Math.cos(b),iy2=cy+ri*Math.sin(b),ix1=cx+ri*Math.cos(angle),iy1=cy+ri*Math.sin(angle),large=a>Math.PI?1:0;s+=`<path d="M${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} L${ix2},${iy2} A${ri},${ri} 0 ${large} 0 ${ix1},${iy1} Z" fill="${colors[i%colors.length]}"><title>${esc(d[labelKey])}: ${fmt(v)}</title></path>`;angle=b});s+=svgText(cx,cy-2,fmt(total),21,"#17365d","middle","700")+svgText(cx,cy+18,"Total",11,"#667085","middle");el.innerHTML=s;document.getElementById(legendId).innerHTML=items.map((d,i)=>`<span><i class="dot" style="background:${colors[i%colors.length]}"></i>${esc(d[labelKey])}: <b>${fmt(d[valueKey])}</b></span>`).join("")}
+function table(id,headers,rows){document.getElementById(id).innerHTML=`<thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(v=>`<td>${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody>`}
+function renderSupportDemo(){
+const demo=[{label:"Yes",count:42},{label:"No",count:28},{label:"Neutral",count:30}];
+document.getElementById("supportDemoKpis").innerHTML=demo.map((d,i)=>`<div class="card kpi"><div class="label">${esc(d.label)} · DEMO</div><div class="value">${d.count}</div><div class="note">${d.count}% of total</div></div>`).join("");
+}
+function render(){let wards=filteredWards();let total=wards.reduce((a,x)=>a+x.total,0),male=wards.reduce((a,x)=>a+x.male,0),female=wards.reduce((a,x)=>a+x.female,0),other=wards.reduce((a,x)=>a+x.other,0);
+setKpis("overviewKpis",[kpi("Total Voters",fmt(total),"Register rows in selected wards"),kpi("Male Voters",fmt(male),total?((male/total*100).toFixed(1)+"% of filtered total"):""),kpi("Female Voters",fmt(female),total?((female/total*100).toFixed(1)+"% of filtered total"):""),kpi("Wards Included",fmt(wards.length),"Out of "+DATA.wards.length+" wards")]);
+barChart("wardBars",wards.map(x=>({label:"Ward "+x.ward,count:x.total})),"label","count",{W:700,H:300});
+donut("genderDonut",[{label:"Male",count:male},{label:"Female",count:female},{label:"Other / unknown",count:other}],"label","count","genderLegend");
+let ages=DATA.age.filter(x=>ageFilter.value==="all"||x.group===ageFilter.value);barChart("ageBars",ages.map(x=>({label:x.group,count:x.count})),"label","count",{W:700,H:300});
+table("overviewTable",["Ward","Total","Male","Female","Other / unknown"],wards.map(x=>["Ward "+x.ward,fmt(x.total),fmt(x.male),fmt(x.female),fmt(x.other)]));
+setKpis("wardKpis",[kpi("Selected Ward Voters",fmt(total),"Current ward filter"),kpi("Male",fmt(male),total?((male/total*100).toFixed(1)+"%"):""),kpi("Female",fmt(female),total?((female/total*100).toFixed(1)+"%"):""),kpi("Average Voters per Ward",fmt(wards.length?Math.round(total/wards.length):0),"Selected wards")]);
+stackedWard("wardGenderBars",wards);donut("wardDonut",wards.map(x=>({label:"Ward "+x.ward,count:x.total})),"label","count","wardLegend");
+table("wardTable",["Ward","Total voters","Male","Female","Other / unknown"],wards.map(x=>["Ward "+x.ward,fmt(x.total),fmt(x.male),fmt(x.female),fmt(x.other)]));
+let selectedRows=DATA.wards.filter(x=>wardFilter.value==="all"||String(x.ward)===wardFilter.value);
+let relationRows=DATA.relations;barChart("relationBars",relationRows.map(x=>({label:x.label,count:x.count})),"label","count",{W:700,H:300,pL:160});
+barChart("houseBars",DATA.householdDistribution.map(x=>({label:x.band,count:x.count})),"label","count",{W:700,H:300});
+setKpis("familyKpis",[kpi("Distinct House Numbers",fmt(DATA.households),"Provisional household proxy"),kpi("Average Age",DATA.avgAge===null?"—":DATA.avgAge,"Across records with age"),kpi("Voter Records",fmt(DATA.total),"All register records"),kpi("Relation Categories",fmt(DATA.relations.length),"Recorded labels")]);
+table("familyTable",["Ward","Voters","Male","Female","Household note"],selectedRows.map(x=>["Ward "+x.ward,fmt(x.total),fmt(x.male),fmt(x.female),"Aggregate only"]));
+}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hide",x.id!==b.dataset.page));}));
+[wardFilter,ageFilter].forEach(x=>x.addEventListener("change",render));document.getElementById("reset").addEventListener("click",()=>{wardFilter.value="all";ageFilter.value="all";render()});renderSupportDemo();render();
+</script></body></html>
